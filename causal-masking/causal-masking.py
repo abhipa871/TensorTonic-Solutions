@@ -7,6 +7,6 @@ def apply_causal_mask(scores, mask_value=-1e9):
     Return: masked scores (same shape, dtype=float)
     """
     # Write code here
-    mask = np.tril(np.ones_like(scores, dtype=bool))
+    mask = np.tril(np.ones_like(scores))
     x = np.where(mask, scores, mask_value)
     return x
