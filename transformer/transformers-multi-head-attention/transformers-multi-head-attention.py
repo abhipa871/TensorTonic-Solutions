@@ -22,7 +22,9 @@ def multi_head_attention(Q: np.ndarray, K: np.ndarray, V: np.ndarray,
 
     V = V.reshape(-1, seq_len, num_heads, d_k)
     V = np.einsum('BLHK->BHLK', V)
-    scores = softmax((Q @ K.transpose(0, 1, 3, 2)) / np.sqrt(d_k))@V
-    mha = scores.transpose(0,2,1,3).reshape(-1, seq_len, num_heads*d_k)
-    return mha@W_o
+    out = np.einsum('BHLK, BHMK->BHLM', Q, K)
+    scores = np.einsum('BHML, BHLK->BHMK', softmax(out / np.sqrt(d_k)), V)
+    mha = np.einsum('BHLK->BLHK', scores).reshape(-1, seq_len, num_heads*d_k)
+    return np.einsum('bse,ed->bsd', mha, W_o)
+
     
